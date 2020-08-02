@@ -143,7 +143,6 @@ func pairEE(ec *ecEndpoint, es *esEndpoint, ecStream quic.Stream) {
 
 	var header = &protoj.LinkStreamHeader{
 		Port: ec.targetPort,
-		DUID: ec.targetDevID,
 	}
 
 	protoj.StreamSendJSON(esStream, header)

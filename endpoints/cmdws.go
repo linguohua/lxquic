@@ -210,20 +210,19 @@ func onPairRequest(stream quic.Stream) {
 
 	// receive stream message and forward to tcp
 	go func() {
+		defer conn.Close()
 		for {
 			n, err := stream.Read(quicbuf)
 			if err != nil {
 				log.Println("onPairRequest ws read error:", err)
-				conn.Close()
 				break
 			}
 
 			if n == 0 {
-				conn.Close()
 				break
 			}
 
-			writeAll(conn, quicbuf[0:n])
+			protoj.WriteAll(conn, quicbuf[0:n])
 			if err != nil {
 				break
 			}
@@ -248,29 +247,4 @@ func onPairRequest(stream quic.Stream) {
 	}
 
 	log.Println("onPairRequest, pair link stream end")
-}
-
-// writeAll a function that ensure all bytes write out
-// maybe it is unnecessary, if the underlying tcp connection has ensure that
-func writeAll(conn net.Conn, buf []byte) error {
-	wrote := 0
-	l := len(buf)
-	for {
-		n, err := conn.Write(buf[wrote:])
-		if err != nil {
-			return err
-		}
-
-		if n == 0 {
-			// this should not happen
-			break
-		}
-
-		wrote = wrote + n
-		if wrote == l {
-			break
-		}
-	}
-
-	return nil
 }

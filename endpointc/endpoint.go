@@ -15,8 +15,9 @@ var (
 	// device uuid
 	deviceID string
 	// quic server addr
-	quicAddr string
-
+	quicAddr   string
+	socks5Port int
+	proxyToken string
 	// map keep all current websocket
 	// use for keep-alive
 	holderMap = make(map[string]*sessionholder)
@@ -32,7 +33,9 @@ type Params struct {
 	// device uuid
 	UUID string
 	// quic server addr
-	QuicAddr string
+	QuicAddr   string
+	Socks5Port int
+	ProxyToken string
 }
 
 // keepalive send ping to all websocket holder
@@ -53,11 +56,18 @@ func Run(params *Params) {
 	remotePort = params.RemotePort
 	deviceID = params.UUID
 	quicAddr = params.QuicAddr
+	socks5Port = params.Socks5Port
+	proxyToken = params.ProxyToken
 
 	log.Printf("endpoint run, local port:%d, target port:%d, device uuid:%s", localPort, remotePort, deviceID)
 
 	// keep-alive goroutine
 	go keepalive()
+
+	if proxyToken != "" {
+		log.Printf("endpoint run socks5 server at:%d, proxy token:%s", socks5Port, proxyToken)
+		go startSocks5Server()
+	}
 
 	startTCPListener(localPort)
 }

@@ -13,11 +13,13 @@ import (
 )
 
 var (
-	lport    int
-	rport    int
-	uuid     string
-	quicAddr string
-	daemon   = ""
+	lport      int
+	rport      int
+	uuid       string
+	quicAddr   string
+	proxyToken string
+	socks5Port int
+	daemon     = ""
 )
 
 func init() {
@@ -25,6 +27,8 @@ func init() {
 	flag.IntVar(&rport, "r", 3389, "specify target port")
 	flag.StringVar(&uuid, "u", "", "specify device uuid")
 	flag.StringVar(&quicAddr, "addr", "", "specify quic server address")
+	flag.IntVar(&socks5Port, "s", 1090, "specify socks5 local server port")
+	flag.StringVar(&proxyToken, "su", "", "specify proxy token")
 	flag.StringVar(&daemon, "d", "yes", "specify daemon mode")
 }
 
@@ -61,6 +65,8 @@ func main() {
 		RemotePort: uint16(rport),
 		UUID:       uuid,
 		QuicAddr:   quicAddr,
+		Socks5Port: socks5Port,
+		ProxyToken: proxyToken,
 	}
 
 	// start http server

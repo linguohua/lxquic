@@ -18,9 +18,11 @@ import (
 )
 
 var (
-	ecIndex = 0
-	ecmap   = make(map[int]*ecEndpoint)
-	esmap   = make(map[string]*esEndpoint)
+	ecIndex    = 0
+	ecmap      = make(map[int]*ecEndpoint)
+	esmap      = make(map[string]*esEndpoint)
+	pxmap      = make(map[int]*pxEndpoint)
+	proxyToken string
 )
 
 // keepalive send ping to all websocket
@@ -30,6 +32,10 @@ func keepalive() {
 
 		// first keepalive all xport/web-ssh websocket
 		for _, v := range esmap {
+			v.keepalive()
+		}
+
+		for _, v := range pxmap {
 			v.keepalive()
 		}
 
@@ -44,12 +50,16 @@ func keepalive() {
 type Params struct {
 	// server listen address
 	ListenAddr string
+
+	ProxyToken string
 }
 
 // CreateQuicServer start http server
 func CreateQuicServer(params *Params) {
 	// start keepalive goroutine
 	go keepalive()
+
+	proxyToken = params.ProxyToken
 
 	log.Printf("quic server listen at:%s", params.ListenAddr)
 
@@ -124,6 +134,9 @@ func onAcceptSession(sess quic.Session) {
 		break
 	case "ec":
 		serveEC(sess, stream, h)
+		break
+	case "px":
+		servePX(sess, stream, h)
 		break
 	}
 }

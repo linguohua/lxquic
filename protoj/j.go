@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"io"
+	"net"
 
 	quic "github.com/lucas-clemente/quic-go"
 )
@@ -11,7 +12,7 @@ import (
 // LinkStreamHeader link stream first packet
 type LinkStreamHeader struct {
 	Port int    `json:"port"`
-	DUID string `json:"duid"`
+	Host string `json:"host,omitempty"`
 }
 
 // CmdStreamHeader cmd stream first packet
@@ -63,6 +64,31 @@ func StreamSendJSON(stream quic.Stream, j interface{}) error {
 	_, err = stream.Write(message)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// WriteAll a function that ensure all bytes write out
+// maybe it is unnecessary, if the underlying tcp connection has ensure that
+func WriteAll(conn net.Conn, buf []byte) error {
+	wrote := 0
+	l := len(buf)
+	for {
+		n, err := conn.Write(buf[wrote:])
+		if err != nil {
+			return err
+		}
+
+		if n == 0 {
+			// this should not happen
+			break
+		}
+
+		wrote = wrote + n
+		if wrote == l {
+			break
+		}
 	}
 
 	return nil

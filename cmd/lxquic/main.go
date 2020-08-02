@@ -15,10 +15,12 @@ import (
 var (
 	listenAddr = ""
 	daemon     = ""
+	proxyToken = ""
 )
 
 func init() {
 	flag.StringVar(&listenAddr, "l", ":443", "specify the listen address")
+	flag.StringVar(&proxyToken, "pt", "", "specify the proxy token")
 	flag.StringVar(&daemon, "d", "yes", "specify daemon mode")
 }
 
@@ -44,6 +46,7 @@ func main() {
 
 	params := &server.Params{
 		ListenAddr: listenAddr,
+		ProxyToken: proxyToken,
 	}
 
 	// start http server
