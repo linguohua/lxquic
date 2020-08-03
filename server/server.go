@@ -28,7 +28,7 @@ var (
 // keepalive send ping to all websocket
 func keepalive() {
 	for {
-		time.Sleep(time.Second * 10)
+		time.Sleep(time.Second * 5)
 
 		// first keepalive all xport/web-ssh websocket
 		for _, v := range esmap {

@@ -51,12 +51,14 @@ func buildCmdWS() (*sessionholder, error) {
 		return nil, err
 	}
 
+	log.Println("buildCmdWS quic.DialAddr ok, try to open stream")
 	stream, err := session.OpenStreamSync(context.Background())
 	if err != nil {
 		session.CloseWithError(0, "OpenStreamSync failed")
 		return nil, err
 	}
 
+	log.Println("buildCmdWS OpenStreamSync ok, try to send stream header")
 	var header = &protoj.CmdStreamHeader{
 		Role: "es",
 		DUID: deviceID,
@@ -68,6 +70,7 @@ func buildCmdWS() (*sessionholder, error) {
 		return nil, err
 	}
 
+	log.Println("buildCmdWS ok")
 	wh := newHolder(deviceID, session, stream)
 	return wh, nil
 }
@@ -123,6 +126,7 @@ func (wh *sessionholder) keepalive() {
 
 // loop read command websocket and process command
 func (wh *sessionholder) loop() {
+	log.Println("sessionholder.loop start")
 	// save to map, for keep-alive
 	holderMap[wh.uuid] = wh
 	sess := wh.sess

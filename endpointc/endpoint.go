@@ -41,7 +41,7 @@ type Params struct {
 // keepalive send ping to all websocket holder
 func keepalive() {
 	for {
-		time.Sleep(time.Second * 10)
+		time.Sleep(time.Second * 5)
 
 		for _, v := range holderMap {
 			v.keepalive()
