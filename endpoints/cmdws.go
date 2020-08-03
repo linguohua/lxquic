@@ -53,6 +53,7 @@ func buildCmdWS() (*sessionholder, error) {
 
 	stream, err := session.OpenStreamSync(context.Background())
 	if err != nil {
+		session.CloseWithError(0, "OpenStreamSync failed")
 		return nil, err
 	}
 
@@ -63,6 +64,7 @@ func buildCmdWS() (*sessionholder, error) {
 
 	err = protoj.StreamSendJSON(stream, header)
 	if err != nil {
+		session.CloseWithError(0, "StreamSendJSON failed")
 		return nil, err
 	}
 
@@ -78,7 +80,7 @@ func cmdwsService() {
 		wh, err := buildCmdWS()
 		if err != nil {
 			log.Println("cmdwsService reconnect later, buildCmdWS failed:", err)
-			time.Sleep(15 * time.Second)
+			time.Sleep(10 * time.Second)
 			continue
 		}
 
