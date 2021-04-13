@@ -140,6 +140,7 @@ func pairEE(ec *ecEndpoint, es *esEndpoint, ecStream quic.Stream) {
 	}
 
 	defer esStream.Close()
+	log.Printf("sess.OpenStreamSync ok, target dev:%s", ec.targetDevID)
 
 	var header = &protoj.LinkStreamHeader{
 		Port: ec.targetPort,
@@ -151,6 +152,8 @@ func pairEE(ec *ecEndpoint, es *esEndpoint, ecStream quic.Stream) {
 		return
 	}
 
+	log.Printf("protoj.StreamSendJSON ok, target dev:%s", ec.targetDevID)
+
 	go func() {
 		defer esStream.Close()
 		defer ecStream.Close()
@@ -159,6 +162,5 @@ func pairEE(ec *ecEndpoint, es *esEndpoint, ecStream quic.Stream) {
 	}()
 
 	io.Copy(ecStream, esStream)
-
 	log.Printf("pairEE ec link stream end, target dev:%s, target port:%d", ec.targetDevID, ec.targetPort)
 }

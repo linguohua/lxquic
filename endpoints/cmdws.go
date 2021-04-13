@@ -142,7 +142,7 @@ func (wh *sessionholder) loop() {
 		}
 
 		// TODO: service link stream
-		onPairRequest(stream)
+		go onPairRequest(stream)
 	}
 
 	// remove from map
